@@ -26,5 +26,5 @@ class Insurance(models.Model):
         return self.insurance_name
     
 class Purchases(models.Model):
-    Insurance=models.ForeignKey(Insurance,on_delete=models.CASCADE)
-    User=models.ForeignKey(User,on_delete=models.CASCADE)
+    insurance_i =models.ForeignKey(Insurance,on_delete=models.CASCADE)
+    user_i=models.ForeignKey(User,on_delete=models.CASCADE)

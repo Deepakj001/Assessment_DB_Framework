@@ -84,33 +84,32 @@ def buy_now(request, pk):
         user_obj = User.objects.get(email = request.session['user_email'])
         global Ins_obj
         Ins_obj = Insurance.objects.get(id = pk)
-        if request.method == 'POST':
-            
-    #------------------COPIED CODE------------------------------#        
-            currency = 'INR'
-            global amount
-            amount = int(request.POST['payment']) * 100 
+        
+        
+#------------------COPIED CODE------------------------------#        
+        currency = 'INR'
+        global amount
+        amount = 1000 * 100 
 
-            # Create a Razorpay Order
-            razorpay_order = razorpay_client.order.create(dict(amount=amount,
-                                                            currency=currency,
-                                                            payment_capture='0'))
-        
-            # order id of newly created order.
-            razorpay_order_id = razorpay_order['id']
-            callback_url = 'paymenthandler/'
-        
-            # we need to pass these details to frontend.
-            context = {}
-            context['razorpay_order_id'] = razorpay_order_id
-            context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
-            context['razorpay_amount'] = amount
-            context['currency'] = currency
-            context['callback_url'] = callback_url
-        
-            return render(request, 'py_process.html', context=context)
-        else:
-            return render(request, 'donate.html', {'tables':Ins_obj, 'userdata': user_obj})
+        # Create a Razorpay Order
+        razorpay_order = razorpay_client.order.create(dict(amount=amount,
+                                                        currency=currency,
+                                                        payment_capture='0'))
+    
+        # order id of newly created order.
+        razorpay_order_id = razorpay_order['id']
+        callback_url = 'paymenthandler/'
+    
+        # we need to pass these details to frontend.
+        context = {}
+        context['razorpay_order_id'] = razorpay_order_id
+        context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
+        context['razorpay_amount'] = amount
+        context['currency'] = currency
+        context['callback_url'] = callback_url
+    
+        return render(request, 'buy_now.html', context=context)
+       
     except:
         return redirect('login')
     
@@ -156,10 +155,9 @@ def paymenthandler(request):
                     razorpay_client.payment.capture(payment_id, amount)
  
                     # render success page on successful caputre of payment
-                    buy_now.objects.create(
-                        pay_by = user_obj,
-                        pay_to = Ins_obj,
-                        amount = amount/100 #1000/100
+                    Purchases.objects.create(
+                        user_i = user_obj,
+                        insurance_i = Ins_obj, 
                     )
                     return render(request, 'success.html')
 
